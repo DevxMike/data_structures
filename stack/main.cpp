@@ -9,36 +9,34 @@
 template<class T> //stack for types with defined operator=()
 class MyStack{
 private:
-    int size;
-    int quantity;
+    std::size_t size;
+    std::size_t quantity;
     T* arr;
 public:
-    explicit MyStack(int stack_size = 10);
+    explicit MyStack(std::size_t stack_size = 10);
     ~MyStack(){
         delete[] arr;
     }
     bool push(const T& item);
     bool pop(T& destination);
-    bool is_empty()const;
-    bool is_full()const;
+    bool empty()const;
+    bool full()const;
 };
 
 template<class T>
-MyStack<T>::MyStack(int stack_size):
-    size(stack_size), quantity(0){
-    arr = new T[size];
-}
+MyStack<T>::MyStack(std::size_t stack_size):
+    size(stack_size), quantity(0), arr(new T[size]){}
 template<class T>
-bool MyStack<T>::is_empty()const{
+bool MyStack<T>::empty()const{
     return quantity == 0;
 }
 template<class T>
-bool MyStack<T>::is_full()const{
+bool MyStack<T>::full()const{
     return quantity == size;
 }
 template<class T>
 bool MyStack<T>::push(const T& item){
-    if(is_full()){
+    if(full()){
         return false;
     }
     else{
@@ -48,7 +46,7 @@ bool MyStack<T>::push(const T& item){
 }
 template<class T>
 bool MyStack<T>::pop(T& destination){
-    if(is_empty()){
+    if(empty()){
         return false;
     }
     else{
@@ -60,35 +58,33 @@ bool MyStack<T>::pop(T& destination){
 template<>
 class MyStack<const char*>{//const char* type stack
 private:
-    int size;
-    int quantity;
+    std::size_t size;
+    std::size_t quantity;
     char** arr;
 public:
-    explicit MyStack(int stack_size = 10);
+    explicit MyStack(std::size_t stack_size = 10);
     ~MyStack(){
-        for(int i = 0; i < quantity; ++i){
+        for(std::size_t i = 0; i < quantity; ++i){
             delete[] arr[i];
         }
         delete[] arr;
     }
     bool push(const char* item);
     bool pop(char*& destination);
-    bool is_empty()const;
-    bool is_full()const;
+    bool empty()const;
+    bool full()const;
 };
 
-MyStack<const char*>::MyStack(int stack_size) :
-    size(stack_size), quantity(0){
-    arr = new char*[size];
-}
-bool MyStack<const char*>::is_empty()const{
+MyStack<const char*>::MyStack(std::size_t stack_size) :
+    size(stack_size), quantity(0), arr(new char*[size]){}
+bool MyStack<const char*>::empty()const{
     return quantity == 0;
 }
-bool MyStack<const char*>::is_full()const{
+bool MyStack<const char*>::full()const{
     return quantity == size;
 }
 bool MyStack<const char*>::push(const char* item){
-    if(is_full()){
+    if(full()){
         return false;
     }
     else{
@@ -98,16 +94,16 @@ bool MyStack<const char*>::push(const char* item){
     }
 }
 bool MyStack<const char*>::pop(char*& destination){ //need to use delete[] on returned pt
-    if(is_empty()){
+    if(empty()){
         return false;
     }
     else{
         destination = new char[std::strlen(arr[--quantity]) + 1];
         std::strcpy(destination, arr[quantity]);
+        delete[] arr[quantity];
         return true;
     }
 }
-
 int main(){
     using std::cout;
     using std::endl;
@@ -117,11 +113,11 @@ int main(){
     MyStack<int> int_stack;
     int temp;
     
-    while(!int_stack.is_full()){
+    while(!int_stack.full()){
         int_stack.push(std::rand() % 10);
     }
     std::vector<int> numbers;
-    while(!int_stack.is_empty()){
+    while(!int_stack.empty()){
         int_stack.pop(temp);
         numbers.push_back(temp);
     }
@@ -135,14 +131,14 @@ int main(){
     std::stringstream stream;
     stream << "word";
     for(auto x : numbers){
-        if(words_stack.is_full()) break;
+        if(words_stack.full()) break;
         stream << x << " ";
         words_stack.push(stream.str().c_str());
     }
     
     cout << endl << "words stack: " << endl;
     char* pt;
-    while(!words_stack.is_empty()){
+    while(!words_stack.empty()){
         words_stack.pop(pt);
         cout << pt << endl;
         delete[] pt;
