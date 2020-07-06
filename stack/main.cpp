@@ -72,7 +72,7 @@ public:
         delete[] arr;
     }
     bool push(const char* item);
-    char* pop();
+    bool pop(char*& destination);
     bool is_empty()const;
     bool is_full()const;
 };
@@ -97,14 +97,14 @@ bool MyStack<const char*>::push(const char* item){
         return true;
     }
 }
-char* MyStack<const char*>::pop(){ //need to use delete[] on returned pt
+bool MyStack<const char*>::pop(char*& destination){ //need to use delete[] on returned pt
     if(is_empty()){
-        return nullptr;
+        return false;
     }
     else{
-        char* destination = new char[std::strlen(arr[--quantity]) + 1];
+        destination = new char[std::strlen(arr[--quantity]) + 1];
         std::strcpy(destination, arr[quantity]);
-        return destination;
+        return true;
     }
 }
 
@@ -143,7 +143,7 @@ int main(){
     cout << endl << "words stack: " << endl;
     char* pt;
     while(!words_stack.is_empty()){
-        pt = words_stack.pop();
+        words_stack.pop(pt);
         cout << pt << endl;
         delete[] pt;
     }
