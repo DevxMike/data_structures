@@ -16,6 +16,7 @@ typedef struct{
     data_t* arr;
 }stack_t;
 
+void copy_data(data_t* destination, const data_t* source);
 bool push(stack_t* stack, const data_t* data);
 data_t* pop(stack_t* stack);
 bool stack_full(const stack_t* stack);
@@ -37,6 +38,7 @@ int main(void){
     unsigned temp;
     char c;
     data_t* pop_pointer, temp_data;
+    FILE* file = fopen("default.dat", "ab+");
 
     printf("Pass the size of stack (size >= 1): ");
     while(scanf("%u", &temp) && temp < 1){
@@ -82,8 +84,20 @@ int main(void){
                     }
                 break;
                 case '3':
+                    if(file == NULL){
+                        printf("Failed while opening the file.\n");
+                    }
+                    else{
+                        
+                    }
                 break;
                 case '4':
+                    if(file == NULL){
+                        printf("Failed while opening the file.\n");
+                    }
+                    else{
+
+                    }
                 break;
                 case '5':
                     printf("-- Stack --\n");
@@ -97,6 +111,9 @@ int main(void){
                 break;
             }
             printf("%s", menu_text);
+        }
+        if(file != NULL){
+            fclose(file);
         }
         free(stack.arr);
     }
@@ -116,9 +133,7 @@ bool push(stack_t* stack, const data_t* data){
     }
     else{
         temp = &stack->arr[stack->quantity++];
-        temp->id = data->id;
-        strcpy(temp->fname, data->fname);
-        strcpy(temp->lname, data->lname);
+        copy_data(temp, data);
         return true;
     }
 }
@@ -135,9 +150,7 @@ data_t* pop(stack_t* stack){
         }
         else{
             pt = &stack->arr[--stack->quantity];
-            temp->id = pt->id;
-            strcpy(temp->fname, pt->fname);
-            strcpy(temp->lname, pt->lname);
+            copy_data(temp, pt);
             return temp;
         }
     }
@@ -150,4 +163,12 @@ bool stack_empty(const stack_t* stack){
 }
 void print_data(const data_t* data){
     printf("id: %d\nfirst name: %s\nlast name: %s\n", data->id, data->fname, data->lname);
+}
+
+void copy_data(data_t* destination, const data_t* source){
+    if(destination != NULL && source != NULL){
+        destination->id = source->id;
+        strcpy(destination->fname, source->fname);
+        strcpy(destination->lname, source->lname);
+    }
 }
