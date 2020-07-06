@@ -49,6 +49,9 @@ int main(void){
     stack.size = temp;
     if((stack.arr = (data_t*)malloc(sizeof(data_t) * stack.size)) == NULL){
         printf("Failed to alloc memory.\n");
+        if(file != NULL){
+            fclose(file);
+        }
         exit(1);
     }
     else{
