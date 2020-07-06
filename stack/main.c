@@ -23,7 +23,9 @@ bool stack_full(const stack_t* stack);
 bool stack_empty(const stack_t* stack);
 void print_data(const data_t* data);
 void clear_in();
-
+int write_to_file(stack_t* stack, FILE* file);
+int read_from_file(stack_t* stack, FILE* file);
+void clear_struct(data_t* data);
 
 const char* menu_text = 
 "[1].Push data to stack.\n"
@@ -68,6 +70,7 @@ int main(void){
                         scanf("%19s", temp_data.lname);
                         clear_in();
                         push(&stack, &temp_data);
+                        clear_struct(&temp_data);
                     }
                     else{
                         printf("Stack full.\n");
@@ -88,7 +91,12 @@ int main(void){
                         printf("Failed while opening the file.\n");
                     }
                     else{
-                        
+                        if(stack_empty(&stack)){
+                            printf("Stack is empty.\n");
+                        }
+                        else{
+                            printf("%d elements written into file.\n", write_to_file(&stack, file));
+                        }
                     }
                 break;
                 case '4':
@@ -96,7 +104,12 @@ int main(void){
                         printf("Failed while opening the file.\n");
                     }
                     else{
-
+                        if(stack_full(&stack)){
+                            printf("Stack full.\n");
+                        }
+                        else{
+                            
+                        }
                     }
                 break;
                 case '5':
@@ -164,11 +177,37 @@ bool stack_empty(const stack_t* stack){
 void print_data(const data_t* data){
     printf("id: %d\nfirst name: %s\nlast name: %s\n", data->id, data->fname, data->lname);
 }
-
 void copy_data(data_t* destination, const data_t* source){
     if(destination != NULL && source != NULL){
         destination->id = source->id;
         strcpy(destination->fname, source->fname);
         strcpy(destination->lname, source->lname);
     }
+}
+int write_to_file(stack_t* stack, FILE* file){
+    data_t* temp;
+    int count = 0;
+
+    while(!stack_empty(stack)){
+        temp = pop(stack);
+        fwrite(temp, sizeof(data_t), 1, file);
+        free(temp);
+        ++count;
+    }
+    return count;    
+}
+int read_from_file(stack_t* stack, FILE* file){
+    int count = 0;
+
+
+
+
+
+    return count;
+}
+void clear_struct(data_t* data){
+    for(int i = 0; i < STR_SIZE; ++i){
+        data->fname[i] = data->lname[i] = '\0';
+    }
+    data->id = 0;
 }
