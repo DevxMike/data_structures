@@ -24,7 +24,8 @@ bool stack_empty(const stack_t* stack);
 void print_data(const data_t* data);
 void clear_in();
 int write_to_file(stack_t* stack, FILE* file);
-int read_from_file(stack_t* stack, FILE* file);
+int read_from_file(stack_t* stack, FILE* file, int* status, fpos_t* offset, bool* flag);
+int fpeek(FILE* file);
 void clear_struct(data_t* data);
 
 const char* menu_text = 
@@ -39,8 +40,12 @@ int main(void){
     stack_t stack; 
     unsigned temp;
     char c;
-    data_t* pop_pointer, temp_data;
-    FILE* file = fopen("default.dat", "ab+");
+    data_t* pop_pointer = NULL, temp_data;
+    int status;
+    FILE* file_out = NULL;
+    FILE* file_in = NULL;
+    fpos_t offset;
+    bool flag = false;
 
     printf("Pass the size of stack (size >= 1): ");
     while(scanf("%u", &temp) && temp < 1){
@@ -49,9 +54,6 @@ int main(void){
     stack.size = temp;
     if((stack.arr = (data_t*)malloc(sizeof(data_t) * stack.size)) == NULL){
         printf("Failed to alloc memory.\n");
-        if(file != NULL){
-            fclose(file);
-        }
         exit(1);
     }
     else{
@@ -63,6 +65,7 @@ int main(void){
             switch(c){
                 case '1':
                     if(!stack_full(&stack)){
+                        clear_struct(&temp_data);
                         printf("Pass the data.\nID: ");
                         scanf("%d", &temp_data.id);
                         printf("First name: ");
@@ -73,7 +76,6 @@ int main(void){
                         scanf("%19s", temp_data.lname);
                         clear_in();
                         push(&stack, &temp_data);
-                        clear_struct(&temp_data);
                     }
                     else{
                         printf("Stack full.\n");
@@ -84,13 +86,14 @@ int main(void){
                         pop_pointer = pop(&stack);
                         print_data(pop_pointer);
                         free(pop_pointer);
+                        pop_pointer = NULL;
                     }
                     else{
                         printf("Stack is empty.\n");
                     }
                 break;
                 case '3':
-                    if(file == NULL){
+                    if((file_out = fopen("default.dat", "ab")) == NULL){
                         printf("Failed while opening the file.\n");
                     }
                     else{
@@ -98,12 +101,13 @@ int main(void){
                             printf("Stack is empty.\n");
                         }
                         else{
-                            printf("%d elements written into file.\n", write_to_file(&stack, file));
+                            printf("%d elements written into file.\n", write_to_file(&stack, file_out));
                         }
+                        fclose(file_out);
                     }
                 break;
                 case '4':
-                    if(file == NULL){
+                    if((file_in = fopen("default.dat", "rb")) == NULL){
                         printf("Failed while opening the file.\n");
                     }
                     else{
@@ -111,7 +115,16 @@ int main(void){
                             printf("Stack full.\n");
                         }
                         else{
-                            
+                            printf("%d elements read from file.\n", read_from_file(&stack, file_in, &status, &offset, &flag));
+                            switch(status){
+                                case 0:
+                                    printf("End of file not reached.\n");
+                                break;
+                                case 1:
+                                    printf("End of file reached.\n");
+                                break;
+                            }
+                            fclose(file_in);
                         }
                     }
                 break;
@@ -128,9 +141,6 @@ int main(void){
             }
             printf("%s", menu_text);
         }
-        if(file != NULL){
-            fclose(file);
-        }
         free(stack.arr);
     }
     return 0;
@@ -142,7 +152,7 @@ void clear_in(){
         continue;
 }
 bool push(stack_t* stack, const data_t* data){
-    data_t* temp;
+    data_t* temp = NULL;
 
     if(stack_full(stack)){
         return false;
@@ -155,7 +165,7 @@ bool push(stack_t* stack, const data_t* data){
 }
 
 data_t* pop(stack_t* stack){
-    data_t* temp, *pt;
+    data_t* temp = NULL, *pt = NULL;
     if(stack_empty(stack)){
         return NULL;
     }
@@ -167,6 +177,7 @@ data_t* pop(stack_t* stack){
         else{
             pt = &stack->arr[--stack->quantity];
             copy_data(temp, pt);
+            clear_struct(pt);
             return temp;
         }
     }
@@ -188,9 +199,9 @@ void copy_data(data_t* destination, const data_t* source){
     }
 }
 int write_to_file(stack_t* stack, FILE* file){
-    data_t* temp;
+    data_t* temp = NULL;
     int count = 0;
-
+    
     while(!stack_empty(stack)){
         temp = pop(stack);
         fwrite(temp, sizeof(data_t), 1, file);
@@ -199,13 +210,28 @@ int write_to_file(stack_t* stack, FILE* file){
     }
     return count;    
 }
-int read_from_file(stack_t* stack, FILE* file){
+int read_from_file(stack_t* stack, FILE* file, int* status, fpos_t* offset, bool* flag){
     int count = 0;
+    data_t temp;
 
-
-
-
-
+    rewind(file);
+    if(*flag){
+        fsetpos(file, offset);
+    }
+    while(!stack_full(stack)){
+        if(fpeek(file) == EOF){ 
+            *status = 1;
+            rewind(file);
+            *flag = false;
+            break;
+        }
+        fread(&temp, sizeof(data_t), 1, file);
+        copy_data(&stack->arr[stack->quantity++], &temp);
+        ++count;
+    }
+    fgetpos(file, offset);
+    *status = *flag? 1 : 0;
+    *flag = true;
     return count;
 }
 void clear_struct(data_t* data){
@@ -213,4 +239,10 @@ void clear_struct(data_t* data){
         data->fname[i] = data->lname[i] = '\0';
     }
     data->id = 0;
+}
+int fpeek(FILE* file){
+    char c = getc(file);
+    ungetc(c, file);
+
+    return c;
 }
