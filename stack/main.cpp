@@ -9,18 +9,18 @@
 template<class T> //stack for types with defined operator=()
 class MyStack{
 private:
-    std::size_t size;
-    std::size_t quantity;
-    T* arr;
+    std::size_t size; //max size of the stack
+    std::size_t quantity; //actual size of stack
+    T* arr; //pointer to array of stack elements
 public:
-    explicit MyStack(std::size_t stack_size = 10);
-    ~MyStack(){
-        delete[] arr;
+    explicit MyStack(std::size_t stack_size = 10); //stack constructor
+    ~MyStack(){ 
+        delete[] arr; //delete array of values
     }
-    bool push(const T& item);
-    bool pop(T& destination);
-    bool empty()const;
-    bool full()const;
+    bool push(const T& item); //add an element
+    bool pop(T& destination); //pop an element from stack
+    bool empty()const; //check whether stack is empty
+    bool full()const; //-||- is full
 };
 
 template<class T>
@@ -28,11 +28,11 @@ MyStack<T>::MyStack(std::size_t stack_size):
     size(stack_size), quantity(0), arr(new T[size]){}
 template<class T>
 bool MyStack<T>::empty()const{
-    return quantity == 0;
+    return quantity == 0; //if the actual size of stack equals 0 then it is empty
 }
 template<class T>
 bool MyStack<T>::full()const{
-    return quantity == size;
+    return quantity == size; //if actual size of stack equals its maximal size then it is full
 }
 template<class T>
 bool MyStack<T>::push(const T& item){
@@ -60,14 +60,14 @@ class MyStack<const char*>{//const char* type stack
 private:
     std::size_t size;
     std::size_t quantity;
-    char** arr;
+    char** arr; //if we want to store this type on stack, we simply need a matrix (pointer to array of pointers)
 public:
     explicit MyStack(std::size_t stack_size = 10);
     ~MyStack(){
-        for(std::size_t i = 0; i < quantity; ++i){
+        for(std::size_t i = 0; i < quantity; ++i){//delete arrays
             delete[] arr[i];
         }
-        delete[] arr;
+        delete[] arr; //delete array of previously deleted pointers
     }
     bool push(const char* item);
     bool pop(char*& destination);
@@ -88,8 +88,8 @@ bool MyStack<const char*>::push(const char* item){
         return false;
     }
     else{
-        arr[quantity] = new char[std::strlen(item) + 1];
-        std::strcpy(arr[quantity++], item);
+        arr[quantity] = new char[std::strlen(item) + 1]; //allocate a new array of lenght of the C string + 1 (for a NULL char)
+        std::strcpy(arr[quantity++], item); //copy string to newly allocated memory
         return true;
     }
 }
@@ -98,9 +98,9 @@ bool MyStack<const char*>::pop(char*& destination){ //need to use delete[] on re
         return false;
     }
     else{
-        destination = new char[std::strlen(arr[--quantity]) + 1];
-        std::strcpy(destination, arr[quantity]);
-        delete[] arr[quantity];
+        destination = new char[std::strlen(arr[--quantity]) + 1]; //allocate memory which will be pointed by argument passed to the method
+        std::strcpy(destination, arr[quantity]); //copy string
+        delete[] arr[quantity]; //delete not used memory
         return true;
     }
 }
@@ -108,7 +108,7 @@ int main(){
     using std::cout;
     using std::endl;
 
-    std::srand(std::time(NULL));
+    std::srand(std::time(NULL)); 
 
     MyStack<int> int_stack;
     int temp;
