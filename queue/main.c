@@ -26,10 +26,38 @@ bool queue_empty(const queue_t* queue); //checks if queue is empty
 bool queue_full(const queue_t* queue); //checks if queue is full
 void copy_data(data_t* destination, const data_t* source); //copies the data
 void print_struct(const data_t* data); //prints data
+void free_queue(queue_t* queue);
 
 int main(void){
-    
+    int i = 0, j;
+    queue_t queue = {3, 0, NULL}; //queue init
+    data_t s[5] = {
+        {1, "customer 1"},
+        {2, "customer 2"},
+        {3, "customer 3"},
+        {4, "customer 4"},
+        {5, "customer 5"}
+    }, *temp;
 
+    printf("Adding customers to a queue.\n");
+    while(enqueue(&queue, &s[i++])){
+        continue;
+    }
+    printf("Added %d customers, processing!\n", --i);
+    while((temp = dequeue(&queue)) != NULL){
+        print_struct(temp);
+        free(temp);
+    }
+    printf("Adding the rest of customers to a queue.\n");
+    for(j = i; j < 5; ++j){
+        enqueue(&queue, &s[j]);
+    }
+    printf("Added %d customers, processing!\n", j - i);
+    while((temp = dequeue(&queue)) != NULL){
+        print_struct(temp);
+        free(temp);
+    }
+    free_queue(&queue);
     return 0;
 }
 
@@ -93,4 +121,15 @@ void copy_data(data_t* destination, const data_t* source){
 }
 void print_struct(const data_t* data){
     printf("ID: %d\nString: %s\n", data->number, data->string);
+}
+void free_queue(queue_t* queue){
+    queue_data_t* temp = NULL;
+
+    if(!queue_empty(queue)){
+        while(queue->head != NULL){
+            temp = queue->head;
+            queue->head = temp->next;
+            free(temp);
+        }
+    }
 }
