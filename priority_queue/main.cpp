@@ -2,7 +2,7 @@
 #include <functional>
 
 
-template<class T, typename compare = std::greater<T>>
+template<class T, typename compare = std::less<T>>
 class PriorityQueue{
 private:
     std::size_t max; //max size of queue
@@ -35,13 +35,23 @@ public:
         else{
             data_t* temp = new data_t;
             temp->item = item;
-            if(empty()){
-                head = temp;
+            if(empty()){ //if queue is empty
+                head = tail = temp;
                 head->next = nullptr;
             }
             else{
-                
-                
+                data_t* pt1 = head; 
+                if(!evaluate(pt1->item, temp->item)){ //if item to be enqueued has a higher/lesser priority than head
+                    temp->next = pt1; //head is replaced with new element
+                    head = temp;
+                }
+                else{ //else we have to find the element, that will have same or lesser/higher priority than the one to be enqueued
+                    while(pt1->next != nullptr && evaluate(pt1->next->item, temp->item)){
+                        pt1 = pt1->next; //while pt1->next is not pointing to null and next item has higher/lesser priority 
+                    }//continue the search
+                    temp->next = pt1->next; //replace elements in queue
+                    pt1->next = temp;
+                }
             }
             ++quantity;
             return true;
@@ -68,23 +78,45 @@ public:
     }
 };
 
+void clr(){ //clear the input
+    while(std::cin.get() != '\n'){
+        continue;
+    }
+}
+
+using data = struct{ //some random struct 
+    std::string some_string;
+    int id;
+};
+bool operator<(const data& d1, const data& d2){ //operator < defined to compare 2 different structs
+    return d1.id < d2.id;
+}
+bool operator>(const data& d1, const data& d2){ //operator > (same as above)
+    return !(d1 < d2);
+}
+
+
 int main(){
     using std::cout;
     using std::endl;
     using std::cin;
-    
-    PriorityQueue<std::string, std::less<std::string>> string_queue(4); //example of usage
-    std::string temp;
-    while(!string_queue.full()){
-        cout << "Pass a string in: ";
-        getline(cin, temp);
-        string_queue.enqueue(temp);
+    data temp;
+    PriorityQueue<data, std::greater<data>> data_queue(3);
+    while(!data_queue.full()){
+        cout << "Pass ID: ";
+        cin >> temp.id;
+        clr();
+        cout << "Pass a string: ";
+        getline(cin, temp.some_string);
+        data_queue.enqueue(temp);
     }
+    
+    cout << "Items in queue: " << endl;
 
-    cout << "Items in queue:" << endl;
-    while(!string_queue.empty()){
-        string_queue.dequeue(temp);
-        cout << temp << endl;
+    while(!data_queue.empty()){
+        data_queue.dequeue(temp);
+        cout << "ID: " << temp.id << endl;
+        cout << "String: " << temp.some_string << endl << endl;
     }
     return 0;
 }

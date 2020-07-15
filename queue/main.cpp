@@ -36,7 +36,6 @@ bool MyQueue<T>::enqueue(const T& data){
     }
     else{
         data_t* temp = new data_t; //newly allocated memory for our new element in queue
-        data_t* pt;
         temp->item = data; //copying the data
         temp->next = nullptr; //temp is the last element of queue
 
