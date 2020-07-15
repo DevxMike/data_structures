@@ -18,6 +18,7 @@ typedef struct{
     size_t size; //max size of the queue
     size_t quantity; //elements stored in queue
     queue_data_t* head; //pointer to the head of the queue
+    queue_data_t* tail; //pointer to the last element of the queue
 }queue_t;
 
 bool enqueue(queue_t* queue, const data_t* element); //adds an element to our data structure
@@ -62,7 +63,7 @@ int main(void){
 }
 
 bool enqueue(queue_t* queue, const data_t* element){
-    queue_data_t* temp = NULL, *pt;
+    queue_data_t* temp = NULL;
 
     if(queue_full(queue)){ //if queue is full, we can`t push an element to it`s end
         return false;
@@ -75,12 +76,11 @@ bool enqueue(queue_t* queue, const data_t* element){
             temp->next = NULL; //that`s the last element of queue
             copy_data(&temp->data, element); //copy data 
             if(queue->head == NULL){ //if head is equal to NULL val then the element to be enqueued is our new head
-                queue->head = temp; 
+                queue->head = queue->tail = temp; 
             }
             else{
-                pt = queue->head;
-                while(pt->next != NULL) pt = pt->next; //search the end of the queue
-                pt->next = temp;
+                queue->tail->next = temp;
+                queue->tail = queue->tail->next;
             }
             ++queue->quantity; 
             return true;
