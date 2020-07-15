@@ -10,10 +10,11 @@ private:
         T item;
         data_t* next;
     }data_t;
-    data_t* head; //array of elements
+    data_t* head;
+    data_t* tail;
 public:
     MyQueue(std::size_t max_size = 10):
-        max(max_size), quantity(0), head(nullptr){}
+        max(max_size), quantity(0), head(nullptr), tail(nullptr){}
     ~MyQueue();
     bool full()const;
     bool empty()const;
@@ -40,14 +41,12 @@ bool MyQueue<T>::enqueue(const T& data){
         temp->next = nullptr; //temp is the last element of queue
 
         if(head == nullptr){ //if queue is empty
-            head = temp;
+            head = tail = temp;
         }
         else{
-            pt = head;
-            while(pt->next != nullptr){
-                pt = pt->next;
-            } //while pointer is not pointing to last element of our queue
-            pt->next = temp; //copying the data
+            pt = tail;
+            tail->next = temp; //copying the data
+            tail = tail->next;
         }
         ++quantity;
         return true;
