@@ -43,7 +43,6 @@ bool MyQueue<T>::enqueue(const T& data){
             head = tail = temp;
         }
         else{
-            pt = tail;
             tail->next = temp; //copying the data
             tail = tail->next;
         }
