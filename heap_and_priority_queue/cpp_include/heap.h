@@ -85,6 +85,12 @@ namespace data_structures{
                 }
             }
     };
+    
+    template<class T, class _cmp = std::greater<T>>
+    class priority_queue : private heap<T, _cmp>{
+        private:
+        public:
+    };
 };
 
 #endif

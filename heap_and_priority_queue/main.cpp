@@ -5,7 +5,7 @@
 
 int main(){
     std::srand(std::time(NULL));
-    data_structures::heap<int> integer_heap(20);
+    data_structures::heap<int, std::less<int>> integer_heap(20);
     int temp;
     std::cout << "Before sort:\n";
     while(integer_heap.insert((temp = std::rand()%100))){
