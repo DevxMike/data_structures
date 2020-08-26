@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+void swap_data(data_t* d1, data_t* d2){ //swap 2 structs
+    data_t temp;
+    copy_data(&temp, d1);
+    copy_data(d1, d2);
+    copy_data(d2, &temp);
+}
+
 int greater(const data_t* d1, const data_t* d2){
     if(strcmp(d1->string, d2->string) >= 0){ //if first string is greater return 1
         return 1;
@@ -61,11 +68,30 @@ int heap_push(heap_t* heap, const data_t* data){
     }
 }
 void shift_down(heap_t* heap, unsigned index, unsigned left, unsigned right){
-
+    if(left < heap->quantity && right < heap->quantity){ //if parent node has 2 children
+        if(heap->compare(&heap->arr[left], &heap->arr[right])){ //if left is greatest one 
+            if(heap->compare(&heap->arr[left], &heap->arr[index])){ //swap, if its greater than parent and continue retoring order or stop
+                swap_data(&heap->arr[index], &heap->arr[left]);
+                shift_down(heap, left, left*2 + 1, left*2 + 2);
+            }
+        }
+        else{
+            if(heap->compare(&heap->arr[right], &heap->arr[index])){ //else if right is greater child
+                swap_data(&heap->arr[index], &heap->arr[right]);//swap, if its greater than parent and continue retoring order or stop
+                shift_down(heap, right, right*2 + 1, right*2 + 2);
+            }
+        }
+    }
+    else if(left < heap->quantity){ //else if there is only one child
+        if(heap->compare(&heap->arr[left], &heap->arr[index])){ //same as above but that`s last child to compare
+            swap_data(&heap->arr[index], &heap->arr[left]);
+            shift_down(heap, left, left*2 + 1, left*2 + 2);
+        }
+    }
 }
 data_t* heap_pop(heap_t* heap){
     data_t* temp = NULL;
-    
+
     if((temp = (data_t*)malloc(sizeof(data_t))) == NULL){ //if memory alloc failed
         return NULL;
     }
@@ -78,12 +104,6 @@ data_t* heap_pop(heap_t* heap){
 void copy_data(data_t* d1, const data_t* d2){ //copy struct
     strcpy(d1->string, d2->string);
     d1->value = d2->value;
-}
-void swap_data(data_t* d1, data_t* d2){ //swap 2 structs
-    data_t temp;
-    copy_data(&temp, d1);
-    copy_data(d1, d2);
-    copy_data(d2, &temp);
 }
 void print_data(const data_t* data){ //print struct data
     printf("%19s\t%13s\n%19s\t%13d\n",
