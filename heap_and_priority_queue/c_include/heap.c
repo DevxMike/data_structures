@@ -92,11 +92,12 @@ void shift_down(heap_t* heap, unsigned index, unsigned left, unsigned right){
 data_t* heap_pop(heap_t* heap){
     data_t* temp = NULL;
 
-    if((temp = (data_t*)malloc(sizeof(data_t))) == NULL){ //if memory alloc failed
+    if(heap_empty(heap) || ((temp = (data_t*)malloc(sizeof(data_t))) == NULL)){ //if memory alloc failed
         return NULL;
     }
     else{
-        copy_data(temp, &heap->arr[--heap->quantity]); //else copy struct 
+        copy_data(temp, &heap->arr[0]);
+        copy_data(&heap->arr[0], &heap->arr[--heap->quantity]); //else copy struct 
         shift_down(heap, 0, 1, 2); //restore heap`s order
         return temp;
     }

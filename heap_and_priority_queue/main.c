@@ -4,12 +4,12 @@
 #define QUANTITY 6
 
 data_t test[QUANTITY] = {
-    {"bcd", 5},
-    {"def", 6},
-    {"cde", 1},
-    {"fgh", 0},
-    {"efg", 7},
-    {"abc", 4}
+    {"Coding is great!", 5},
+    {"I <3 C/C++!", 6},
+    {"AVR is good", 1},
+    {"STM is very cool!", 0},
+    {"ARM rocks!", 7},
+    {"Sysdev for life!", 4}
 };
 
 int main(void){
@@ -22,15 +22,14 @@ int main(void){
         heap_push(heap1, temp);
         heap_push(heap2, temp);
     }
+    printf("\nSorting by strings in structs.\n");
     printf("\nAfter sort (ASC):\n\n");
-    while(!heap_empty(heap1)){
-        temp = heap_pop(heap1);
+    while((temp = heap_pop(heap1)) != NULL){
         print_data(temp);
         free(temp);
     }
     printf("\nAfter sort (DESC):\n\n");
-    while(!heap_empty(heap2)){
-        temp = heap_pop(heap2);
+    while((temp = heap_pop(heap2)) != NULL){
         print_data(temp);
         free(temp);
     }
