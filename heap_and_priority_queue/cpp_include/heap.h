@@ -57,7 +57,7 @@ namespace data_structures{
             ~heap(){
                 delete[] arr;
             }
-            bool empty()const{
+            virtual bool empty()const{
                 return quantity == 0;
             }
             bool full()const{
@@ -84,12 +84,6 @@ namespace data_structures{
                     return true;
                 }
             }
-    };
-    
-    template<class T, class _cmp = std::greater<T>>
-    class priority_queue : private heap<T, _cmp>{
-        private:
-        public:
     };
 };
 
