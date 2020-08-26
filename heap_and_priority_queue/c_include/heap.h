@@ -16,14 +16,15 @@ typedef struct{
 }heap_t;
 
 typedef enum{
-    less = 0,
-    greater
+    less_el = 0,
+    greater_el
 }heap_cmp;
 
-heap_t* init_heap(size_t);
+heap_t* init_heap(size_t, heap_cmp);
 int heap_empty(const heap_t*);
 int heap_full(const heap_t*);
 int heap_push(heap_t*, const data_t*);
 data_t* heap_pop(heap_t*);
 void copy_data(data_t*, const data_t*);
+void print_data(const data_t*);
 #endif
